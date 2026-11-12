@@ -1,0 +1,459 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>체형평가프로그램</title>
+<style>
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:#F3F5F3;color:#16211D;font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",system-ui,sans-serif;font-size:15px;line-height:1.5}
+button,input{font-family:inherit}
+button{cursor:pointer}
+button:focus-visible,input:focus-visible,a:focus-visible,label:focus-within{outline:3px solid #1B4FD8;outline-offset:2px}
+[hidden]{display:none!important}
+header{background:#fff;border-bottom:1px solid #DDE3DF;position:sticky;top:0;z-index:5}
+.bar{max-width:1200px;margin:0 auto;padding:12px 16px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+.brand{font-size:12px;font-weight:600;color:#0F6E5C}
+h1{margin:0;font-size:22px;font-weight:700}
+.tabs{display:flex;gap:4px;padding:4px;background:#E8ECEA;border-radius:10px}
+.tabs button{min-height:44px;padding:0 16px;border:0;border-radius:7px;background:transparent;color:#16211D;font-size:14px;font-weight:700}
+.tabs button[aria-pressed=true]{background:#fff}
+.wrap{max-width:1200px;margin:0 auto;padding:16px;display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start}
+.col{flex:1 1 320px;min-width:0;display:flex;flex-direction:column;gap:12px}
+.stagecol{max-width:560px}
+.stage{position:relative;width:100%;aspect-ratio:3/4;border-radius:12px;overflow:hidden;background:#16211D}
+.stage video,.stage img,.fill{position:absolute;top:0;left:0;width:100%;height:100%}
+.stage video,.stage img{object-fit:cover}
+.grid{background-image:linear-gradient(to right,rgba(255,255,255,.4) 1px,transparent 1px),linear-gradient(to bottom,rgba(255,255,255,.4) 1px,transparent 1px);background-size:12.5% 12.5%}
+.plumb{position:absolute;top:0;left:50%;width:2px;height:100%;margin-left:-1px;background:#FFD23F}
+.chip{position:absolute;top:12px;left:12px;padding:6px 12px;border-radius:8px;background:rgba(0,0,0,.7);color:#fff;font-size:14px;font-weight:700}
+.msg{display:flex;flex-direction:column;gap:14px;align-items:center;justify-content:center;padding:28px;text-align:center;color:#fff}
+.msg p{margin:0;max-width:320px;padding:12px 16px;border-radius:10px;background:rgba(0,0,0,.7)}
+.count{display:flex;align-items:center;justify-content:center;color:#fff;font-size:160px;font-weight:700;text-shadow:0 2px 16px rgba(0,0,0,.7)}
+.btn{min-height:48px;padding:0 16px;border:1px solid #A9B5AF;border-radius:10px;background:#fff;color:#16211D;font-size:15px;font-weight:600;display:flex;align-items:center;justify-content:center;text-align:center;text-decoration:none}
+.btn.primary{min-height:56px;border-color:#0F6E5C;background:#0F6E5C;color:#fff;font-size:17px;font-weight:700}
+.btn.light{border:0}
+.btn:disabled{background:#C5CEC9;border-color:#C5CEC9;color:#3B4641}
+.row2{display:flex;flex-wrap:wrap;gap:8px}
+.row2>*{flex:1 1 140px}
+.filebtn input{position:absolute;width:1px;height:1px;opacity:0}
+.filebtn{position:relative;cursor:pointer}
+.card{background:#fff;border:1px solid #DDE3DF;border-radius:12px;padding:14px 16px 16px;display:flex;flex-direction:column;gap:10px}
+.card h2{margin:0;font-size:16px}
+.cardhead{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
+.shot{display:flex;gap:8px;align-items:stretch}
+.shot>button{flex:1;min-height:72px;padding:8px 12px;display:flex;gap:12px;align-items:center;border:2px solid #DDE3DF;border-radius:10px;background:#fff;color:#16211D;text-align:left}
+.shot>button[aria-pressed=true]{border-color:#0F6E5C}
+.thumb{width:42px;height:56px;flex:none;border-radius:6px;overflow:hidden;background:#E8ECEA;display:flex;align-items:center;justify-content:center;font-weight:700;color:#4F5B56}
+.thumb img{width:100%;height:100%;object-fit:cover}
+.shot b{display:block;font-size:15px}
+.shot small{font-size:13px;color:#4F5B56;font-weight:500}
+.shot small.done{color:#0F6E5C}
+.shot a{flex:none;width:64px}
+.line{display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-top:1px solid #E8ECEA}
+.line span{color:#4F5B56}
+.hint{margin:0;font-size:13px;color:#4F5B56}
+nav{flex:1 1 200px;display:flex;flex-direction:column;gap:4px}
+nav button{min-height:48px;padding:0 14px;display:flex;align-items:center;justify-content:space-between;gap:12px;border:0;border-radius:8px;background:transparent;color:#16211D;font-size:15px;font-weight:500;text-align:left}
+nav button small{font-size:12px;color:#4F5B56}
+nav button[aria-current=page]{background:#0F6E5C;color:#fff;font-weight:700}
+nav button[aria-current=page] small{color:#fff}
+.content{flex:999 1 320px;min-width:0;display:flex;flex-direction:column;gap:16px}
+.content h2{margin:0;font-size:20px}
+.content>div>p{margin:4px 0 0;color:#4F5B56}
+.group{background:#fff;border:1px solid #DDE3DF;border-radius:12px;padding:4px 16px 8px}
+.group h3{margin:0;padding:14px 0 6px;font-size:13px;color:#4F5B56}
+.set{display:flex;flex-wrap:wrap;gap:10px 20px;align-items:center;justify-content:space-between;padding:12px 0;border-top:1px solid #E8ECEA}
+.group h3+.set{border-top-color:transparent}
+.set .txt{flex:1 1 200px;min-width:0}
+.set .txt b{font-weight:600;display:block}
+.set .txt small{font-size:13px;color:#4F5B56}
+.sw{width:60px;height:44px;padding:0;border:0;background:transparent;display:flex;align-items:center;justify-content:center}
+.sw i{width:48px;height:28px;padding:3px;border-radius:14px;background:#77837D;display:flex}
+.sw i::after{content:"";width:22px;height:22px;border-radius:11px;background:#fff}
+.sw[aria-checked=true] i{background:#0F6E5C;justify-content:flex-end}
+.opts{display:flex;flex-wrap:wrap;gap:6px}
+.opts button{min-height:44px;padding:0 14px;border:1px solid #A9B5AF;border-radius:8px;background:#fff;color:#16211D;font-size:14px;font-weight:500}
+.opts button[aria-pressed=true]{background:#0F6E5C;border-color:#0F6E5C;color:#fff;font-weight:700}
+.set input{height:44px;padding:0 12px;border:1px solid #A9B5AF;border-radius:8px;background:#fff;color:#16211D;font-size:16px}
+.set input[type=text]{flex:0 1 260px;min-width:0;width:100%}
+.pair{display:flex;flex-wrap:wrap;gap:12px}
+.pair label{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600}
+.pair label.w{color:#8A5A00}.pair label.d{color:#A3261A}
+.pair input{width:76px}
+.pair em{font-style:normal;color:#4F5B56;font-weight:400}
+.note{margin:0;padding:12px 14px;border:1px solid #E3CF9A;border-radius:10px;background:#FFF8E3;color:#5C4300;font-size:14px}
+</style>
+</head>
+<body>
+<header>
+  <div class="bar">
+    <div>
+      <div class="brand">체형평가프로그램</div>
+      <h1 id="title">카메라 모드</h1>
+    </div>
+    <div class="tabs" role="group" aria-label="화면 전환">
+      <button type="button" id="tabCam" aria-pressed="true">카메라 모드</button>
+      <button type="button" id="tabSet" aria-pressed="false">설정</button>
+    </div>
+  </div>
+</header>
+
+<main id="cam" class="wrap">
+  <div class="col stagecol">
+    <div class="stage">
+      <video id="video" playsinline muted aria-label="카메라 화면"></video>
+      <img id="still" alt="촬영한 사진" hidden>
+      <div id="grid" class="fill grid" aria-hidden="true"></div>
+      <div id="plumb" class="plumb" aria-hidden="true"></div>
+      <div id="chip" class="chip"></div>
+      <div id="msg" class="fill msg">
+        <p id="msgText"></p>
+        <button type="button" id="camOn" class="btn light">카메라 켜기</button>
+      </div>
+      <div id="count" class="fill count" aria-live="assertive" hidden></div>
+    </div>
+    <button type="button" id="shoot" class="btn primary"></button>
+    <div class="row2">
+      <label class="btn filebtn"><input type="file" id="file" accept="image/*" capture="environment">휴대폰 카메라로 찍기</label>
+      <button type="button" id="flip" class="btn">전면·후면 전환</button>
+      <button type="button" id="retake" class="btn" hidden>다시 찍기</button>
+    </div>
+    <p class="hint">실시간 화면이 켜지지 않으면 "휴대폰 카메라로 찍기"를 누르세요. 찍은 사진 위에 기준선이 겹쳐 보입니다.</p>
+  </div>
+
+  <div class="col">
+    <section class="card">
+      <div class="cardhead">
+        <h2>촬영 순서</h2>
+        <button type="button" id="clear" class="btn">처음부터 다시</button>
+      </div>
+      <div id="shots" style="display:flex;flex-direction:column;gap:8px"></div>
+    </section>
+    <section class="card">
+      <h2>적용 중인 촬영 설정</h2>
+      <div id="summary"></div>
+      <button type="button" id="toCapture" class="btn">촬영 설정 바꾸기</button>
+    </section>
+  </div>
+</main>
+
+<main id="set" class="wrap" hidden>
+  <nav id="nav" aria-label="설정 분류"></nav>
+  <div class="content">
+    <div><h2 id="secTitle"></h2><p id="secDesc"></p></div>
+    <div id="groups" style="display:flex;flex-direction:column;gap:16px"></div>
+    <p id="note" class="note" hidden></p>
+    <div class="row2">
+      <button type="button" id="reset" class="btn">기본값으로 되돌리기</button>
+    </div>
+    <p class="hint" id="saveHint"></p>
+  </div>
+</main>
+
+<script>
+(function () {
+  var T = 'toggle', C = 'choice', X = 'text', P = 'pair';
+  var DEFS = [
+    { id: 'center', title: '센터·평가자', desc: '리포트 머리말에 들어가는 정보입니다.', groups: [
+      { title: '센터 정보', rows: [
+        { id: 'centerName', type: X, label: '센터 이름', desc: '리포트 맨 위에 표시됩니다.', def: '', placeholder: '[센터 이름]' },
+        { id: 'centerPhone', type: X, label: '대표 연락처', desc: '리포트 아래쪽에 표시됩니다.', def: '', placeholder: '[전화번호]' },
+        { id: 'showLogo', type: T, label: '리포트에 로고 넣기', desc: '등록한 로고를 리포트 머리말에 넣습니다.', def: true }
+      ] },
+      { title: '평가자', rows: [
+        { id: 'assessor', type: X, label: '기본 평가자 이름', desc: '새 평가를 시작할 때 자동으로 채워집니다.', def: '', placeholder: '[평가자 이름]' },
+        { id: 'showAssessor', type: T, label: '리포트에 평가자 이름 표시', desc: '', def: true }
+      ] }
+    ] },
+    { id: 'capture', title: '촬영', desc: '사진을 찍는 방향과 촬영을 돕는 화면 표시를 정합니다.', groups: [
+      { title: '촬영 방향', rows: [
+        { id: 'dirFront', type: T, label: '정면', desc: '어깨·골반 높이, 무릎 정렬을 봅니다.', def: true },
+        { id: 'dirBack', type: T, label: '후면', desc: '척추 정렬, 견갑 위치를 봅니다.', def: true },
+        { id: 'dirLeft', type: T, label: '왼쪽 측면', desc: '머리·어깨·골반의 앞뒤 정렬을 봅니다.', def: true },
+        { id: 'dirRight', type: T, label: '오른쪽 측면', desc: '', def: false }
+      ] },
+      { title: '촬영 보조', rows: [
+        { id: 'timer', type: C, label: '촬영 타이머', desc: '버튼을 누른 뒤 찍히기까지 기다리는 시간입니다.', def: '5초', options: ['없음', '3초', '5초', '10초'] },
+        { id: 'grid', type: T, label: '격자선 표시', desc: '촬영 화면에 가로·세로 격자를 겹쳐 보여 줍니다.', def: true },
+        { id: 'plumb', type: T, label: '수직 기준선 표시', desc: '몸 중심선을 맞추는 세로선입니다.', def: true },
+        { id: 'mirror', type: T, label: '거울 모드(좌우 반전)', desc: '촬영 화면을 거울처럼 보여 줍니다. 저장되는 사진은 반전하지 않습니다.', def: false },
+        { id: 'heightScale', type: T, label: '키 입력으로 실제 길이 환산', desc: '회원 키를 기준으로 화면 길이를 cm로 바꿉니다.', def: true }
+      ] }
+    ] },
+    { id: 'items', title: '평가 항목', desc: '평가와 리포트에 포함할 항목을 고릅니다. 끈 항목은 측정하지 않습니다.', groups: [
+      { title: '상체', rows: [
+        { id: 'itHead', type: T, label: '전방머리자세(거북목)', desc: '측면 사진에서 귀와 어깨의 앞뒤 위치를 비교합니다.', def: true },
+        { id: 'itRound', type: T, label: '라운드숄더', desc: '측면 사진에서 어깨가 앞으로 말린 정도를 봅니다.', def: true },
+        { id: 'itShoulder', type: T, label: '어깨 높이 차이', desc: '정면·후면 사진에서 좌우 어깨 높이를 비교합니다.', def: true },
+        { id: 'itSpine', type: T, label: '척추 측만 경향', desc: '후면 사진에서 척추선이 좌우로 휜 정도를 봅니다.', def: true }
+      ] },
+      { title: '하체', rows: [
+        { id: 'itPelvisSide', type: T, label: '골반 좌우 기울기', desc: '정면·후면 사진에서 좌우 골반 높이를 비교합니다.', def: true },
+        { id: 'itPelvisTilt', type: T, label: '골반 전방·후방 경사', desc: '측면 사진에서 골반이 앞뒤로 기운 정도를 봅니다.', def: true },
+        { id: 'itKnee', type: T, label: '무릎 정렬(O다리·X다리)', desc: '정면 사진에서 고관절·무릎·발목의 정렬을 봅니다.', def: true },
+        { id: 'itFoot', type: T, label: '발목·발 아치', desc: '후면 사진에서 발뒤꿈치 기울기를 봅니다.', def: false }
+      ] }
+    ] },
+    { id: 'criteria', title: '판정 기준', desc: '측정값을 정상·주의·위험으로 나누는 기준입니다.', note: '아래 숫자는 자리를 채워 둔 임시값입니다. 센터에서 쓰는 기준으로 바꿔 주세요.', groups: [
+      { title: '판정 방식', rows: [
+        { id: 'levels', type: C, label: '판정 단계', desc: '', def: '3단계', options: ['3단계', '5단계'] },
+        { id: 'colorLevels', type: T, label: '단계별 색으로 표시', desc: '정상·주의·위험을 색과 글자로 함께 표시합니다.', def: true }
+      ] },
+      { title: '항목별 기준값', rows: [
+        { id: 'thHead', type: P, label: '머리 전방 각도', desc: '', unit: '°', def: [10, 20] },
+        { id: 'thShoulder', type: P, label: '어깨 기울기', desc: '', unit: '°', def: [2, 5] },
+        { id: 'thPelvis', type: P, label: '골반 기울기', desc: '', unit: '°', def: [2, 5] },
+        { id: 'thKnee', type: P, label: '무릎 정렬 각도', desc: '', unit: '°', def: [5, 10] }
+      ] }
+    ] },
+    { id: 'report', title: '리포트', desc: '회원에게 주는 결과지의 내용과 형식을 정합니다.', groups: [
+      { title: '포함할 내용', rows: [
+        { id: 'rpPhoto', type: T, label: '촬영 사진', desc: '기준선과 각도가 그려진 사진을 넣습니다.', def: true },
+        { id: 'rpTable', type: T, label: '측정값 표', desc: '항목별 수치와 판정을 표로 넣습니다.', def: true },
+        { id: 'rpCompare', type: T, label: '이전 평가와 비교', desc: '지난 평가 사진과 수치를 나란히 보여 줍니다.', def: true },
+        { id: 'rpExercise', type: T, label: '추천 운동', desc: '판정 결과에 맞는 운동을 넣습니다.', def: true },
+        { id: 'rpComment', type: T, label: '평가자 코멘트', desc: '직접 쓴 메모를 넣습니다.', def: true }
+      ] },
+      { title: '형식', rows: [
+        { id: 'rpTone', type: C, label: '용어 수준', desc: '회원이 읽기 쉬운 말로 풀어 쓸지 정합니다.', def: '쉬운 말', options: ['쉬운 말', '전문 용어'] },
+        { id: 'rpFormat', type: C, label: '저장 형식', desc: '', def: 'PDF', options: ['PDF', '이미지'] },
+        { id: 'rpPaper', type: C, label: '용지 크기', desc: '', def: 'A4', options: ['A4', '모바일 세로'] }
+      ] }
+    ] },
+    { id: 'member', title: '회원·데이터', desc: '회원 사진과 평가 기록을 다루는 방식을 정합니다.', groups: [
+      { title: '재평가', rows: [
+        { id: 'recheck', type: C, label: '재평가 알림 주기', desc: '마지막 평가 뒤 이 기간이 지나면 알려 줍니다.', def: '8주', options: ['끔', '4주', '8주', '12주'] }
+      ] },
+      { title: '개인정보', rows: [
+        { id: 'consent', type: T, label: '촬영 전 동의 받기', desc: '사진 촬영·보관 동의를 받아야 촬영을 시작할 수 있습니다.', def: true },
+        { id: 'faceBlur', type: T, label: '리포트에서 얼굴 가리기', desc: '', def: false },
+        { id: 'keep', type: C, label: '사진 보관 기간', desc: '기간이 지난 사진은 자동으로 지웁니다.', def: '1년', options: ['6개월', '1년', '3년', '직접 지울 때까지'] }
+      ] },
+      { title: '백업', rows: [
+        { id: 'backup', type: T, label: '자동 백업', desc: '평가 기록을 정해진 폴더에 날마다 복사합니다.', def: true },
+        { id: 'exportFmt', type: C, label: '기록 내보내기 형식', desc: '', def: '엑셀', options: ['엑셀', 'CSV'] }
+      ] }
+    ] },
+    { id: 'general', title: '화면·일반', desc: '프로그램 화면과 기본 동작을 정합니다.', groups: [
+      { title: '화면', rows: [
+        { id: 'lang', type: C, label: '언어', desc: '', def: '한국어', options: ['한국어', 'English'] },
+        { id: 'unit', type: C, label: '길이 단위', desc: '', def: 'cm', options: ['cm', 'inch'] },
+        { id: 'fontSize', type: C, label: '글자 크기', desc: '', def: '보통', options: ['보통', '크게'] },
+        { id: 'dark', type: T, label: '어두운 화면', desc: '', def: false }
+      ] },
+      { title: '보안', rows: [
+        { id: 'lock', type: T, label: '시작할 때 비밀번호 묻기', desc: '회원 정보를 다른 사람이 볼 수 없게 합니다.', def: false },
+        { id: 'autoLock', type: C, label: '자동 잠금', desc: '이 시간 동안 쓰지 않으면 잠급니다.', def: '끔', options: ['끔', '5분', '15분', '30분'] }
+      ] }
+    ] }
+  ];
+  var DIRS = [['dirFront', '정면'], ['dirBack', '후면'], ['dirLeft', '왼쪽 측면'], ['dirRight', '오른쪽 측면']];
+  var KEY = 'posture-settings-v1';
+  var FLAT = {};
+  DEFS.forEach(function (s) { s.groups.forEach(function (g) { g.rows.forEach(function (r) { FLAT[r.id] = r; }); }); });
+
+  var canStore = true;
+  function load() {
+    try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { canStore = false; return {}; }
+  }
+  function store() {
+    try { localStorage.setItem(KEY, JSON.stringify(st.vals)); canStore = true; } catch (e) { canStore = false; }
+  }
+
+  var st = { mode: 'cam', active: 'center', vals: load(), cam: 'idle', facing: 'environment', count: 0, shots: {}, dir: null };
+  var stream = null, timer = null;
+  function $(id) { return document.getElementById(id); }
+  function esc(v) { return String(v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+  function val(id) { return st.vals[id] === undefined ? FLAT[id].def : st.vals[id]; }
+  function setVal(id, v) { st.vals[id] = v; store(); }
+  function dirs() { return DIRS.filter(function (d) { return val(d[0]); }); }
+  function cur() {
+    var list = dirs();
+    for (var i = 0; i < list.length; i++) if (list[i][0] === st.dir) return list[i];
+    return list[0] || null;
+  }
+  function nextOpen() {
+    var list = dirs();
+    for (var i = 0; i < list.length; i++) if (!st.shots[list[i][0]]) return list[i];
+    return null;
+  }
+
+  /* ---------- 카메라 ---------- */
+  var video = $('video');
+  function stopCam() {
+    if (stream) { stream.getTracks().forEach(function (t) { t.stop(); }); stream = null; }
+    if (timer) { clearInterval(timer); timer = null; }
+    st.count = 0;
+    video.srcObject = null;
+  }
+  function startCam() {
+    stopCam();
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { st.cam = 'blocked'; renderCam(); return; }
+    st.cam = 'asking'; renderCam();
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: st.facing, width: { ideal: 1920 }, height: { ideal: 1080 } }, audio: false }).then(function (s) {
+      stream = s;
+      video.srcObject = s;
+      var p = video.play();
+      if (p && p.catch) p.catch(function () {});
+      st.cam = 'on'; renderCam();
+    }).catch(function () { st.cam = 'blocked'; renderCam(); });
+  }
+  function capture(dirId) {
+    if (!stream || !video.videoWidth) return;
+    var c = document.createElement('canvas');
+    c.width = video.videoWidth; c.height = video.videoHeight;
+    c.getContext('2d').drawImage(video, 0, 0);
+    st.shots[dirId] = c.toDataURL('image/jpeg', 0.9);
+    st.dir = dirId;
+    renderCam();
+  }
+  function shoot() {
+    var d = cur();
+    if (!d || timer) return;
+    if (st.shots[d[0]]) {
+      var n = nextOpen();
+      if (n) { st.dir = n[0]; renderCam(); }
+      return;
+    }
+    if (st.cam !== 'on') { startCam(); return; }
+    var sec = parseInt(val('timer'), 10) || 0;
+    if (!sec) { capture(d[0]); return; }
+    st.count = sec; renderCam();
+    timer = setInterval(function () {
+      st.count -= 1;
+      if (st.count <= 0) { clearInterval(timer); timer = null; st.count = 0; capture(d[0]); }
+      else renderCam();
+    }, 1000);
+  }
+
+  function renderCam() {
+    var d = cur(), shot = d ? st.shots[d[0]] : null, list = dirs();
+    $('grid').hidden = !val('grid');
+    $('plumb').hidden = !val('plumb');
+    video.style.transform = val('mirror') ? 'scaleX(-1)' : 'none';
+    $('chip').textContent = d ? d[1] : '촬영 방향 없음';
+    $('still').hidden = !shot;
+    if (shot) $('still').src = shot;
+    var showMsg = !shot && st.cam !== 'on' && !st.count;
+    $('msg').hidden = !showMsg;
+    $('msgText').textContent = st.cam === 'asking' ? '브라우저가 묻는 카메라 사용을 허용해 주세요.'
+      : st.cam === 'blocked' ? '실시간 카메라를 켤 수 없습니다. 아래 "휴대폰 카메라로 찍기"를 눌러 주세요.'
+      : '카메라가 꺼져 있습니다.';
+    $('camOn').hidden = st.cam === 'asking';
+    $('camOn').textContent = st.cam === 'blocked' ? '다시 시도' : '카메라 켜기';
+    $('count').hidden = !st.count;
+    $('count').textContent = st.count || '';
+    var btn = $('shoot'), n = nextOpen();
+    btn.disabled = false;
+    if (!d) { btn.textContent = '설정에서 촬영 방향을 켜 주세요'; btn.disabled = true; }
+    else if (st.count) btn.textContent = '곧 촬영합니다';
+    else if (shot && n) btn.textContent = '다음 방향: ' + n[1];
+    else if (shot) { btn.textContent = '모든 방향 촬영 완료'; btn.disabled = true; }
+    else if (st.cam !== 'on') btn.textContent = '카메라 켜고 ' + d[1] + ' 촬영';
+    else btn.textContent = d[1] + ' 촬영';
+    $('retake').hidden = !shot;
+    $('flip').hidden = !!shot;
+
+    $('shots').innerHTML = list.length ? list.map(function (x, i) {
+      var s = st.shots[x[0]], on = d && x[0] === d[0];
+      return '<div class="shot"><button type="button" data-dir="' + x[0] + '" aria-pressed="' + on + '">' +
+        '<span class="thumb">' + (s ? '<img src="' + s + '" alt="">' : (i + 1)) + '</span>' +
+        '<span><b>' + x[1] + '</b><small class="' + (s ? 'done' : '') + '">' + (s ? '촬영 완료' : on ? '지금 촬영할 차례' : '대기') + '</small></span></button>' +
+        (s ? '<a class="btn" download="체형_' + x[1] + '.jpg" href="' + s + '" aria-label="' + x[1] + ' 사진 저장">저장</a>' : '') + '</div>';
+    }).join('') : '<p class="hint">설정의 촬영 방향이 모두 꺼져 있습니다. 하나 이상 켜 주세요.</p>';
+
+    function onOff(v) { return v ? '켬' : '끔'; }
+    $('summary').innerHTML = [['촬영 타이머', val('timer')], ['격자선', onOff(val('grid'))], ['수직 기준선', onOff(val('plumb'))], ['거울 모드', onOff(val('mirror'))]]
+      .map(function (l) { return '<div class="line"><span>' + l[0] + '</span><b>' + l[1] + '</b></div>'; }).join('');
+  }
+
+  /* ---------- 설정 ---------- */
+  function renderSet() {
+    var sec = DEFS.filter(function (s) { return s.id === st.active; })[0] || DEFS[0];
+    $('nav').innerHTML = DEFS.map(function (s) {
+      var n = 0; s.groups.forEach(function (g) { n += g.rows.length; });
+      return '<button type="button" data-nav="' + s.id + '"' + (s.id === sec.id ? ' aria-current="page"' : '') + '><span>' + s.title + '</span><small>' + n + '개</small></button>';
+    }).join('');
+    $('secTitle').textContent = sec.title;
+    $('secDesc').textContent = sec.desc;
+    $('note').hidden = !sec.note;
+    $('note').textContent = sec.note || '';
+    $('saveHint').textContent = canStore ? '바꾼 설정은 이 기기에 자동으로 저장됩니다.' : '이 방식으로 연 파일에서는 설정이 저장되지 않습니다. 화면을 닫으면 기본값으로 돌아갑니다.';
+    $('groups').innerHTML = sec.groups.map(function (g) {
+      return '<section class="group"><h3>' + g.title + '</h3>' + g.rows.map(function (r) {
+        var v = val(r.id), ctl = '';
+        if (r.type === T) ctl = '<button type="button" class="sw" role="switch" aria-checked="' + !!v + '" aria-label="' + esc(r.label) + '" data-toggle="' + r.id + '"><i></i></button>';
+        if (r.type === C) ctl = '<div class="opts" role="group" aria-label="' + esc(r.label) + '">' + r.options.map(function (o) {
+          return '<button type="button" aria-pressed="' + (o === v) + '" data-choice="' + r.id + '" data-v="' + esc(o) + '">' + o + '</button>';
+        }).join('') + '</div>';
+        if (r.type === X) ctl = '<input type="text" aria-label="' + esc(r.label) + '" data-text="' + r.id + '" value="' + esc(v) + '" placeholder="' + esc(r.placeholder || '') + '">';
+        if (r.type === P) ctl = '<div class="pair">' +
+          '<label class="w">주의 <input type="number" inputmode="decimal" min="0" step="0.5" data-pair="' + r.id + '" data-i="0" value="' + esc(v[0]) + '"><em>' + r.unit + ' 이상</em></label>' +
+          '<label class="d">위험 <input type="number" inputmode="decimal" min="0" step="0.5" data-pair="' + r.id + '" data-i="1" value="' + esc(v[1]) + '"><em>' + r.unit + ' 이상</em></label></div>';
+        return '<div class="set"><div class="txt"><b>' + r.label + '</b>' + (r.desc ? '<small>' + r.desc + '</small>' : '') + '</div>' + ctl + '</div>';
+      }).join('') + '</section>';
+    }).join('');
+  }
+
+  function show(mode) {
+    st.mode = mode;
+    if (mode !== 'cam') { stopCam(); st.cam = 'idle'; }
+    $('cam').hidden = mode !== 'cam';
+    $('set').hidden = mode !== 'set';
+    $('tabCam').setAttribute('aria-pressed', mode === 'cam');
+    $('tabSet').setAttribute('aria-pressed', mode === 'set');
+    $('title').textContent = mode === 'cam' ? '카메라 모드' : '설정';
+    if (mode === 'cam') renderCam(); else renderSet();
+    window.scrollTo(0, 0);
+  }
+
+  /* ---------- 이벤트 ---------- */
+  $('tabCam').onclick = function () { show('cam'); };
+  $('tabSet').onclick = function () { show('set'); };
+  $('toCapture').onclick = function () { st.active = 'capture'; show('set'); };
+  $('camOn').onclick = startCam;
+  $('shoot').onclick = shoot;
+  $('flip').onclick = function () { st.facing = st.facing === 'environment' ? 'user' : 'environment'; startCam(); };
+  $('retake').onclick = function () { var d = cur(); if (d) { delete st.shots[d[0]]; renderCam(); } };
+  $('clear').onclick = function () { st.shots = {}; st.dir = null; renderCam(); };
+  $('file').onchange = function (e) {
+    var f = e.target.files && e.target.files[0], d = cur();
+    if (!f || !d) return;
+    var target = st.shots[d[0]] ? (nextOpen() || d) : d;
+    st.shots[target[0]] = URL.createObjectURL(f);
+    st.dir = target[0];
+    e.target.value = '';
+    renderCam();
+  };
+  $('shots').onclick = function (e) {
+    var b = e.target.closest('[data-dir]');
+    if (b) { st.dir = b.getAttribute('data-dir'); renderCam(); }
+  };
+  $('reset').onclick = function () { st.vals = {}; store(); renderSet(); };
+  $('set').addEventListener('click', function (e) {
+    var b = e.target.closest('button');
+    if (!b) return;
+    if (b.dataset.nav) { st.active = b.dataset.nav; renderSet(); }
+    else if (b.dataset.toggle) { setVal(b.dataset.toggle, !val(b.dataset.toggle)); renderSet(); }
+    else if (b.dataset.choice) { setVal(b.dataset.choice, b.dataset.v); renderSet(); }
+  });
+  $('set').addEventListener('input', function (e) {
+    var el = e.target;
+    if (el.dataset.text) setVal(el.dataset.text, el.value);
+    else if (el.dataset.pair) {
+      var v = val(el.dataset.pair).slice();
+      v[+el.dataset.i] = el.value;
+      setVal(el.dataset.pair, v);
+    }
+  });
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden && stream) { stopCam(); st.cam = 'idle'; renderCam(); }
+  });
+
+  show('cam');
+})();
+</script>
+</body>
+</html>
